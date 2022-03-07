@@ -1,8 +1,8 @@
 package sandbox.exceptions;
 
-import sandbox.exceptions.errors.ErrorCode;
 import lombok.Getter;
 import lombok.ToString;
+import sandbox.exceptions.errors.ErrorCode;
 
 @ToString
 public class RCCException extends Exception {

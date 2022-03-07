@@ -10,6 +10,16 @@ import java.util.Objects;
 public class CommonUtils {
     public static final Integer NOT_INIT_INT_VALUE = -1;
 
+    @SafeVarargs
+    public static <T> Object[] asObjectsArray(T... a) {
+        Object[] objects = new Object[a.length];
+        int i = 0;
+        for(T elem : a) {
+            objects[i++] = elem;
+        }
+        return objects;
+    }
+
     @Getter
     @Setter
     @AllArgsConstructor

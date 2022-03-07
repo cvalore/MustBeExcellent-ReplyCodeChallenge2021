@@ -1,10 +1,11 @@
 package sandbox;
 
+import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sandbox.exceptions.RCCException;
 import sandbox.exceptions.errors.ReaderErrorCode;
 import sandbox.exceptions.errors.StringUtilsErrorCode;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -12,15 +13,12 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+@AllArgsConstructor
 public class Reader {
 
     private final Logger LOGGER = LogManager.getLogger(Reader.class);
 
     private final FileProcessorInterface processor;
-
-    public Reader(FileProcessorInterface processor) {
-        this.processor = processor;
-    }
 
     /**
      * Method to multiple files from an array
@@ -91,6 +89,7 @@ public class Reader {
                 while ((line = br.readLine()) != null) {
                     this.processor.process(line);
                 }
+                this.processor.setProcessed();
             } catch (IOException e) {
                 LOGGER.error("Error while reading file", e);
                 throw new RCCException(ReaderErrorCode.ERROR_WHILE_READING);
