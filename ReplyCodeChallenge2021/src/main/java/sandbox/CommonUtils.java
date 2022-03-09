@@ -1,10 +1,11 @@
 package sandbox;
 
-import com.sun.istack.internal.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 public class CommonUtils {
