@@ -3,7 +3,9 @@ package sandbox.rcc_2022;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -17,6 +19,7 @@ public class Demon {
     private int recoveredStamina;
     private int turnsEarningFragments;
     private List<Integer> fragmentsEarnt = new ArrayList<>();
+    private Map<Integer, Integer> rewardMap = new HashMap<>();
 
     public static Demon createFromStringArray(String[] a) {
         Demon d = new Demon();
@@ -30,6 +33,13 @@ public class Demon {
         d.turnsEarningFragments = turnsEarningFragments;
         for(int i = 4; i < a.length; i++) {
             d.fragmentsEarnt.add(Integer.parseInt(a[i]));
+        }
+
+        int sum = 0;
+        d.rewardMap.clear();
+        for(int i = 0; i < d.fragmentsEarnt.size(); i++) {
+            sum = sum + d.fragmentsEarnt.get(i);
+            d.rewardMap.put(i+1, sum);
         }
 
         return d;

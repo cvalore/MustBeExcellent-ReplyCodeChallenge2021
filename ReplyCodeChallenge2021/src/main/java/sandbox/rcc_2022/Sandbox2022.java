@@ -16,7 +16,6 @@ public class Sandbox2022 implements Sandbox {
     private static final Logger LOGGER = LogManager.getLogger(Sandbox2022.class);
 
     private static final String COMMON_INPUT_PATH = "input/2022/";
-    private static final String COMMON_OUTPUT_PATH = "2022/";
 
     private static final String INPUT_FILENAME = "00-example.txt";
 
