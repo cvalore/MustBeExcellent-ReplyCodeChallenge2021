@@ -77,15 +77,18 @@ public class FileProcessor2022 implements FileProcessorInterface {
         }
 
         inputDemons.sort(Demon::compareByStamina);
-        demonsByStamina = inputDemons;
+        demonsByStamina = new ArrayList<>(inputDemons);
+        Collections.reverse(demonsByStamina);
+
 
         inputDemons.sort((o1, o2) -> o1.compareByFinalReward(o2, turnsAvailable.getValue()));
-        demonsByFinalReward = inputDemons;
+        demonsByFinalReward = new ArrayList<>(inputDemons);;
+        Collections.reverse(demonsByFinalReward);
 
         inputDemons.sort(Demon::compareByFinalStaminaRecoveryRate);
-        demonsByStaminaRecoveryRate = inputDemons;
+        demonsByStaminaRecoveryRate = new ArrayList<>(inputDemons);;
+        Collections.reverse(demonsByStaminaRecoveryRate);
 
-        LOGGER.info("TODO: TO BE IMPLEMENTED - do algorithm implementation here");
         gameLoop();
 
     }
