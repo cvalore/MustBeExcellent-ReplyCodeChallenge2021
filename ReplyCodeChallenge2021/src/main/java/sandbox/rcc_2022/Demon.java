@@ -57,19 +57,19 @@ public class Demon {
     }
 
     public int compareByStamina(Demon o) {
-        return -Integer.compare(this.staminaConsumedToFace, o.getStaminaConsumedToFace());
+        return Integer.compare(this.staminaConsumedToFace, o.getStaminaConsumedToFace());
     }
 
     public int compareByFinalReward(Demon o, int turns) {
 
-        return -Integer.compare(this.getMaxReward(turns), o.getMaxReward(turns));
+        return Integer.compare(this.getMaxReward(turns), o.getMaxReward(turns));
     }
 
     public int compareByFinalStaminaRecoveryRate(Demon o) {
-        if (-Double.compare(this.getStaminaRecoveryRate(), o.getStaminaRecoveryRate()) == 0) {
-            return -Integer.compare(this.turnsToRecoverStamina, o.getTurnsToRecoverStamina());
+        if (Double.compare(this.getStaminaRecoveryRate(), o.getStaminaRecoveryRate()) == 0) {
+            return Integer.compare(this.turnsToRecoverStamina, o.getTurnsToRecoverStamina());
         } else {
-            return -Double.compare(this.getStaminaRecoveryRate(), o.getStaminaRecoveryRate());
+            return Double.compare(this.getStaminaRecoveryRate(), o.getStaminaRecoveryRate());
         }
     }
 
