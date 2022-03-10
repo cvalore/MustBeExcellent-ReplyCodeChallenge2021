@@ -83,4 +83,22 @@ public class Sandbox2022 implements Sandbox {
         assert (this.demonsAvailable.getValue() != CommonUtils.NOT_INIT_INT_VALUE);
         assert (this.inputDemons.size() == this.demonsAvailable.getValue());
     }
+
+    private int loseStamina(int value) {
+        int newStamina = this.currentStamina.getValue() - value;
+        if(newStamina < 0) {
+            newStamina = 0;
+        }
+        this.currentStamina.setValue(newStamina);
+        return newStamina;
+    }
+
+    private int increaseStamina(int value) {
+        int newStamina = this.currentStamina.getValue() + value;
+        if(newStamina > this.maxStamina.getValue()) {
+            newStamina = this.maxStamina.getValue();
+        }
+        this.currentStamina.setValue(newStamina);
+        return newStamina;
+    }
 }
