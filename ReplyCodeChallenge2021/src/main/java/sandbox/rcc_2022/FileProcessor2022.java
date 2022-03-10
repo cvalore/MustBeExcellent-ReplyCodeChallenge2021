@@ -42,6 +42,10 @@ public class FileProcessor2022 implements FileProcessorInterface {
     private int totalScore;
     //endregion
 
+    private List<Demon> demonsByStamina;
+    private List<Demon> demonsByFinalReward;
+    private List<Demon> demonsByStaminaRecoveryRate;
+
 
     @Override
     public void process(InputStream inputStream) {
@@ -70,9 +74,17 @@ public class FileProcessor2022 implements FileProcessorInterface {
             LOGGER.error("run invoked on processor without previous processing");
             throw new RCCException(ProcessorErrorCode.RUN_WITHOUT_PROCESSING);
         }
+
+        inputDemons.sort(Demon::compareByStamina);
+        demonsByStamina = inputDemons;
+
+        inputDemons.sort((o1, o2) -> o1.compareByFinalReward(o2, turnsAvailable.getValue()));
+        demonsByFinalReward = inputDemons;
+
+        inputDemons.sort(Demon::compareByFinalStaminaRecoveryRate);
+        demonsByStaminaRecoveryRate = inputDemons;
+
         LOGGER.info("TODO: TO BE IMPLEMENTED - do algorithm implementation here");
-
-
         gameLoop();
 
     }
