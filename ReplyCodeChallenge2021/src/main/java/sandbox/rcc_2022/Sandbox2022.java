@@ -17,7 +17,12 @@ public class Sandbox2022 implements Sandbox {
 
     private static final String COMMON_INPUT_PATH = "input/2022/";
 
-    private static final String INPUT_FILENAME = "02-iot-island-of-terror.txt";
+    private static final String INPUT_FILENAME_0 = "00-example.txt";
+    private static final String INPUT_FILENAME_2 = "01-the-cloud-abyss.txt";
+    private static final String INPUT_FILENAME_3 = "02-iot-island-of-terror.txt";
+    private static final String INPUT_FILENAME_4 = "03-etheryum.txt";
+    private static final String INPUT_FILENAME_5 = "04-the-desert-of-autonomous-machines.txt";
+    private static final String INPUT_FILENAME_6 = "05-androids-armageddon.txt";
 
 
     //region INPUT FIELDS
@@ -32,6 +37,8 @@ public class Sandbox2022 implements Sandbox {
     @Override
     public void run() {
         boolean readSuccess = true;
+
+        String INPUT_FILENAME = INPUT_FILENAME_4;
 
         LOGGER.debug("Starting sandbox run");
 

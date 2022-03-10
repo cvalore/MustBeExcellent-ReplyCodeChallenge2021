@@ -3,6 +3,7 @@ package sandbox.rcc_2022;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.java.Log;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sandbox.CommonUtils;
@@ -101,20 +102,27 @@ public class FileProcessor2022 implements FileProcessorInterface {
     private void gameLoop() {
         for (int i = 0; i < this.turnsAvailable.getValue(); i++) {
 
-            LOGGER.info("turn: {}", i);
+            if(currentStamina.getValue() < 0 || currentStamina.getValue() >= maxStamina.getValue()){
+                System.err.println("Errore stamina");
+            }
+
+
             inputDemons.sort((o1, o2) -> o1.compareByFinalReward(o2, turnsAvailable.getValue() - currentTurn));
             demonsByFinalReward = new ArrayList<>(inputDemons);
 
             Collections.reverse(demonsByFinalReward);
 
             recoverStamina();
+
+            LOGGER.info("turn: {}, stamina: {}", i, currentStamina);
             Demon d = chooseDemonToFace();
 
             if (d != null) {
                 usedDemons.add(d.getId());
                 faceDemon(d);
             }
-            collectFragments();
+
+            //collectFragments();
 
             currentTurn++;
         }
@@ -127,7 +135,8 @@ public class FileProcessor2022 implements FileProcessorInterface {
             int remainingTurns = d.decreaseTurnToRecoverStamina(1);
             if (remainingTurns == 0) {
                 toBeRemoved.add(d);
-                currentStamina.setValue(currentStamina.getValue() + d.getRecoveredStamina());
+                increaseStamina(d.getRecoveredStamina());
+                LOGGER.info("Recovered {} stamina form deamon {}", d.getRecoveredStamina(), d.getId());
             }
         });
 
@@ -235,6 +244,8 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
     private void faceDemon(Demon d) {
 
+        LOGGER.warn("Fight demon {}, required stamina [{}]",d.getId(), d.getStaminaConsumedToFace());
+
         //check if correct
         defeatedDemonsPerTurn.computeIfPresent(currentTurn, (t, list) -> {
             list.add(d);
@@ -246,6 +257,9 @@ public class FileProcessor2022 implements FileProcessorInterface {
         defeatedDemonsPerFragments.add(d);
 
 
+        loseStamina(d.getStaminaConsumedToFace());
+
         d.setFaced(true);
+
     }
 }

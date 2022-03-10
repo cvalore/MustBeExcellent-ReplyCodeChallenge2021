@@ -48,8 +48,7 @@ public abstract class AbstractWriter {
         String completeFilename = BASE_PATH + filename + "." + extension;
         try {
             File file = new File(completeFilename);
-            boolean appendMode = file.exists() && !file.isDirectory();
-            FileWriter fileWriter = new FileWriter(file, appendMode);
+            FileWriter fileWriter = new FileWriter(file, false);
             writer = new BufferedWriter(fileWriter);
         } catch (IOException e) {
             LOGGER.error("Error while initializing writer to filename {}", completeFilename);
