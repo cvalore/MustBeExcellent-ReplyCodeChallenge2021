@@ -12,6 +12,9 @@ public class Sandbox2020 implements Sandbox {
 
     private static final Logger LOGGER = LogManager.getLogger(Sandbox2020.class);
 
+    private static final String COMMON_PATH = "input/2022/";
+
+
     //region INPUT FIELDS
     private CommonUtils.IntegerWrapper gridWidth = new CommonUtils.IntegerWrapper(CommonUtils.NOT_INIT_INT_VALUE);
     private CommonUtils.IntegerWrapper gridHeight = new CommonUtils.IntegerWrapper(CommonUtils.NOT_INIT_INT_VALUE);
@@ -41,7 +44,7 @@ public class Sandbox2020 implements Sandbox {
                 .antennasOrchestrator(antennasOrchestrator)
                 .build();
         Reader reader = new Reader(processor2020);
-        String filename = "data_scenarios_a_example.in";
+        String filename = COMMON_PATH + "data_scenarios_a_example.in";
 
         try {
             reader.readFile(filename);
