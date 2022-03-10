@@ -85,4 +85,11 @@ public class Demon {
         }
     }
 
+    public int decreaseTurnToRecoverStamina(int value) {
+        this.turnsToRecoverStamina -= value;
+        if(this.turnsToRecoverStamina < 0) {
+            this.turnsToRecoverStamina = 0;
+        }
+        return this.turnsToRecoverStamina;
+    }
 }

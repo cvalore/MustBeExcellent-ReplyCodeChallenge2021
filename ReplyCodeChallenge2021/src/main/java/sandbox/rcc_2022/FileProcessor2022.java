@@ -35,6 +35,7 @@ public class FileProcessor2022 implements FileProcessorInterface {
     private boolean processed;
     private int lineRead;
 
+    private List<Demon> defeatedDemons = new ArrayList<>();
     private Map<Integer, List<Demon>> defeatedDemonsPerTurn = new HashMap<>();
     private boolean defeatedDemonThisTurn;
 
@@ -95,7 +96,16 @@ public class FileProcessor2022 implements FileProcessorInterface {
     }
 
     private void recoverStamina() {
+        List<Demon> toBeRemoved = new ArrayList<>();
+        defeatedDemons.forEach(d -> {
+            int remainingTurns = d.decreaseTurnToRecoverStamina(1);
+            if(remainingTurns == 0) {
+                toBeRemoved.add(d);
+                currentStamina.setValue(currentStamina.getValue() + d.getRecoveredStamina());
+            }
+        });
 
+        toBeRemoved.forEach(d -> defeatedDemons.remove(d));
     }
 
     private void chooseDemonToFace() {
@@ -156,6 +166,7 @@ public class FileProcessor2022 implements FileProcessorInterface {
                 return list;
             });
             defeatedDemonsPerTurn.putIfAbsent(currentTurn, new ArrayList<>(Collections.singleton(d)));
+            defeatedDemons.add(d);
         }
 
         d.setFaced(true);
