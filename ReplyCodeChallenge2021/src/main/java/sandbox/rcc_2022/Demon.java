@@ -20,6 +20,7 @@ public class Demon {
     private int turnsEarningFragments;
     private List<Integer> fragmentsEarnt = new ArrayList<>();
     private Map<Integer, Integer> rewardMap = new HashMap<>();
+    private boolean faced;
 
     public static Demon createFromStringArray(String[] a) {
         Demon d = new Demon();
@@ -41,6 +42,8 @@ public class Demon {
             sum = sum + d.fragmentsEarnt.get(i);
             d.rewardMap.put(i+1, sum);
         }
+
+        d.faced = false;
 
         return d;
     }
