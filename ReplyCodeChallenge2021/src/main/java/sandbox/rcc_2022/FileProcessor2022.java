@@ -13,7 +13,6 @@ import sandbox.exceptions.errors.ProcessorErrorCode;
 import javax.validation.constraints.NotNull;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Builder
@@ -48,6 +47,8 @@ public class FileProcessor2022 implements FileProcessorInterface {
     private List<Demon> demonsByStaminaRecoveryRate;
 
 
+    private List<Integer> usedDemons;
+
     @Override
     public void process(InputStream inputStream) {
 
@@ -57,7 +58,7 @@ public class FileProcessor2022 implements FileProcessorInterface {
     public void process(String line) {
         LOGGER.info("Read: {}", line);
         String[] splitted = line.split(" ");
-        if(lineRead == 0) {
+        if (lineRead == 0) {
             currentStamina.setValue(Integer.parseInt(splitted[0]));
             maxStamina.setValue(Integer.parseInt(splitted[1]));
             turnsAvailable.setValue(Integer.parseInt(splitted[2]));
@@ -76,17 +77,21 @@ public class FileProcessor2022 implements FileProcessorInterface {
             throw new RCCException(ProcessorErrorCode.RUN_WITHOUT_PROCESSING);
         }
 
+        usedDemons = new ArrayList<>();
+
         inputDemons.sort(Demon::compareByStamina);
         demonsByStamina = new ArrayList<>(inputDemons);
         Collections.reverse(demonsByStamina);
 
 
         inputDemons.sort((o1, o2) -> o1.compareByFinalReward(o2, turnsAvailable.getValue()));
-        demonsByFinalReward = new ArrayList<>(inputDemons);;
+        demonsByFinalReward = new ArrayList<>(inputDemons);
+        ;
         Collections.reverse(demonsByFinalReward);
 
         inputDemons.sort(Demon::compareByFinalStaminaRecoveryRate);
-        demonsByStaminaRecoveryRate = new ArrayList<>(inputDemons);;
+        demonsByStaminaRecoveryRate = new ArrayList<>(inputDemons);
+        ;
         Collections.reverse(demonsByStaminaRecoveryRate);
 
         gameLoop();
@@ -94,15 +99,18 @@ public class FileProcessor2022 implements FileProcessorInterface {
     }
 
     private void gameLoop() {
-        recoverStamina();
-        chooseDemonToFace();
+        for (int i = 0; i < this.turnsAvailable.getValue(); i++) {
+            //recoverStamina();
+            chooseDemonToFace();
+        }
+
     }
 
     private void recoverStamina() {
         List<Demon> toBeRemoved = new ArrayList<>();
         defeatedDemons.forEach(d -> {
             int remainingTurns = d.decreaseTurnToRecoverStamina(1);
-            if(remainingTurns == 0) {
+            if (remainingTurns == 0) {
                 toBeRemoved.add(d);
                 currentStamina.setValue(currentStamina.getValue() + d.getRecoveredStamina());
             }
@@ -111,15 +119,55 @@ public class FileProcessor2022 implements FileProcessorInterface {
         toBeRemoved.forEach(d -> defeatedDemons.remove(d));
     }
 
-    private void chooseDemonToFace() {
-        if(currentTurn > this.turnsAvailable.getValue()) {
-            return;
+    private Demon chooseDemonToFace() {
+        if (currentTurn > this.turnsAvailable.getValue()) {
+            return null;
         }
-        //TODO..
+
+        Map<Integer, Integer> pointsByDemon = new HashMap<>();
+
+        for (int i = 0; i < demonsByStamina.size(); i++) {
+            Demon d = demonsByStamina.get(i);
+            if (pointsByDemon.containsKey(d.getId())) {
+                pointsByDemon.put(d.getId(), pointsByDemon.get(d.getId()) + i);
+            } else {
+                pointsByDemon.put(d.getId(), i);
+            }
+        }
+
+
+        for (int i = 0; i < demonsByFinalReward.size(); i++) {
+            Demon d = demonsByFinalReward.get(i);
+            if (pointsByDemon.containsKey(d.getId())) {
+                pointsByDemon.put(d.getId(), pointsByDemon.get(d.getId()) + i);
+            } else {
+                pointsByDemon.put(d.getId(), i);
+            }
+        }
+
+
+        for (int i = 0; i < demonsByStaminaRecoveryRate.size(); i++) {
+            Demon d = demonsByStaminaRecoveryRate.get(i);
+            if (pointsByDemon.containsKey(d.getId())) {
+                pointsByDemon.put(d.getId(), pointsByDemon.get(d.getId()) + i);
+            } else {
+                pointsByDemon.put(d.getId(), i);
+            }
+        }
+
+        List<Map.Entry<Integer, Integer>> demonsByPoints = new ArrayList<>(pointsByDemon.entrySet());
+        demonsByPoints.sort(Map.Entry.comparingByValue());
+
+        for (Demon d : inputDemons) {
+            if (d.getId() == demonsByPoints.get(0).getKey()) {
+                return d;
+            }
+        }
+        return null;
     }
 
     private void collectFragments() {
-        if(currentTurn > this.turnsAvailable.getValue()) {
+        if (currentTurn > this.turnsAvailable.getValue()) {
             return;
         }
         //TODO..
@@ -132,7 +180,7 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
     private int loseStamina(int value) {
         int newStamina = this.currentStamina.getValue() - value;
-        if(newStamina < 0) {
+        if (newStamina < 0) {
             newStamina = 0;
         }
         this.currentStamina.setValue(newStamina);
@@ -141,7 +189,7 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
     private int increaseStamina(int value) {
         int newStamina = this.currentStamina.getValue() + value;
-        if(newStamina > this.maxStamina.getValue()) {
+        if (newStamina > this.maxStamina.getValue()) {
             newStamina = this.maxStamina.getValue();
         }
         this.currentStamina.setValue(newStamina);
@@ -162,7 +210,7 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
         //..
 
-        if(win) {
+        if (win) {
             //check if correct
             defeatedDemonsPerTurn.computeIfPresent(currentTurn, (t, list) -> {
                 list.add(d);
