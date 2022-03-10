@@ -95,6 +95,11 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
         Collections.reverse(demonsByStaminaRecoveryRate);
 
+        inputDemons.sort((o1, o2) -> o1.compareByFinalReward(o2, turnsAvailable.getValue() - currentTurn));
+        demonsByFinalReward = new ArrayList<>(inputDemons);
+
+        Collections.reverse(demonsByFinalReward);
+
         gameLoop();
 
     }
@@ -157,25 +162,19 @@ public class FileProcessor2022 implements FileProcessorInterface {
             } else {
                 pointsByDemon.put(d.getId(), i);
             }
-        }
 
-
-        for (int i = 0; i < demonsByFinalReward.size(); i++) {
-            Demon d = demonsByFinalReward.get(i);
-            if (pointsByDemon.containsKey(d.getId())) {
-                pointsByDemon.put(d.getId(), pointsByDemon.get(d.getId()) + i);
+            Demon d1 = demonsByFinalReward.get(i);
+            if (pointsByDemon.containsKey(d1.getId())) {
+                pointsByDemon.put(d1.getId(), pointsByDemon.get(d1.getId()) + i);
             } else {
-                pointsByDemon.put(d.getId(), i);
+                pointsByDemon.put(d1.getId(), i);
             }
-        }
 
-
-        for (int i = 0; i < demonsByStaminaRecoveryRate.size(); i++) {
-            Demon d = demonsByStaminaRecoveryRate.get(i);
-            if (pointsByDemon.containsKey(d.getId())) {
-                pointsByDemon.put(d.getId(), pointsByDemon.get(d.getId()) + i);
+            Demon d2 = demonsByStaminaRecoveryRate.get(i);
+            if (pointsByDemon.containsKey(d2.getId())) {
+                pointsByDemon.put(d2.getId(), pointsByDemon.get(d2.getId()) + i);
             } else {
-                pointsByDemon.put(d.getId(), i);
+                pointsByDemon.put(d2.getId(), i);
             }
         }
 

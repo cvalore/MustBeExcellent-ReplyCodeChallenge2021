@@ -38,7 +38,7 @@ public class Sandbox2022 implements Sandbox {
     public void run() {
         boolean readSuccess = true;
 
-        String INPUT_FILENAME = INPUT_FILENAME_4;
+        String INPUT_FILENAME = INPUT_FILENAME_6;
 
         LOGGER.debug("Starting sandbox run");
 
