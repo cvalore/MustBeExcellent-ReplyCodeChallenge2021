@@ -8,6 +8,9 @@ import sandbox.Reader;
 import sandbox.Sandbox;
 import sandbox.exceptions.RCCException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Sandbox2022 implements Sandbox {
 
     private static final Logger LOGGER = LogManager.getLogger(Sandbox2022.class);
@@ -17,13 +20,29 @@ public class Sandbox2022 implements Sandbox {
 
     private static final String INPUT_FILENAME = "00-example.txt";
 
+
+    //region INPUT FIELDS
+    private CommonUtils.IntegerWrapper currentStamina = new CommonUtils.IntegerWrapper(CommonUtils.NOT_INIT_INT_VALUE);
+    private CommonUtils.IntegerWrapper maxStamina = new CommonUtils.IntegerWrapper(CommonUtils.NOT_INIT_INT_VALUE);
+    private CommonUtils.IntegerWrapper turnsAvailable = new CommonUtils.IntegerWrapper(CommonUtils.NOT_INIT_INT_VALUE);
+    private CommonUtils.IntegerWrapper demonsAvailable = new CommonUtils.IntegerWrapper(CommonUtils.NOT_INIT_INT_VALUE);
+    private List<Demon> inputDemons = new ArrayList<>();
+    //endregion
+
+
     @Override
     public void run() {
         boolean readSuccess = true;
 
         LOGGER.debug("Starting sandbox run");
 
-        FileProcessor2022 processor2022 = new FileProcessor2022();
+        FileProcessor2022 processor2022 = new FileProcessor2022.FileProcessor2022Builder()
+                .currentStamina(currentStamina)
+                .maxStamina(maxStamina)
+                .turnsAvailable(turnsAvailable)
+                .demonsAvailable(demonsAvailable)
+                .inputDemons(inputDemons)
+                .build();
         Reader reader = new Reader(processor2022);
         String filename = COMMON_INPUT_PATH + INPUT_FILENAME;
 
@@ -44,6 +63,8 @@ public class Sandbox2022 implements Sandbox {
             LOGGER.error("Exception while running processor: [{}]", e.getErrorCode().code(), e);
         }
 
+        checkAssertions();
+
         AbstractWriter writer = new Writer2022();
         try {
             writer.initWriter(INPUT_FILENAME);
@@ -54,5 +75,13 @@ public class Sandbox2022 implements Sandbox {
         writer.closeWriter();
 
         LOGGER.debug("End sandbox");
+    }
+
+    private void checkAssertions() {
+        assert (this.currentStamina.getValue() != CommonUtils.NOT_INIT_INT_VALUE);
+        assert (this.maxStamina.getValue() != CommonUtils.NOT_INIT_INT_VALUE);
+        assert (this.turnsAvailable.getValue() != CommonUtils.NOT_INIT_INT_VALUE);
+        assert (this.demonsAvailable.getValue() != CommonUtils.NOT_INIT_INT_VALUE);
+        assert (this.inputDemons.size() == this.demonsAvailable.getValue());
     }
 }

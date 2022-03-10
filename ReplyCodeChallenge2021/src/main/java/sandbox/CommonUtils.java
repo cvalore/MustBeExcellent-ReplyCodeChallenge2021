@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 public class CommonUtils {
-    public static final Integer NOT_INIT_INT_VALUE = -1;
+    public static final Integer NOT_INIT_INT_VALUE = Integer.MIN_VALUE;
 
     @SafeVarargs
     public static <T> Object[] asObjectsArray(T... a) {
