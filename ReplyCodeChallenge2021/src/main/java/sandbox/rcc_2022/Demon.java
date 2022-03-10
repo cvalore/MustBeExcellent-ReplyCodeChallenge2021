@@ -14,6 +14,9 @@ import java.util.Map;
 @Data
 @ToString
 public class Demon {
+    private static int idGen = 0;
+
+    private int id;
     private int staminaConsumedToFace;
     private int turnsToRecoverStamina;
     private int recoveredStamina;
@@ -26,7 +29,10 @@ public class Demon {
     public static Demon createFromStringArray(String[] a) {
         Demon d = new Demon();
 
-        assert (a.length >= 4);
+        d.setId(idGen);
+        idGen++;
+
+        assert(a.length >= 4);
         int turnsEarningFragments = Integer.parseInt(a[3]);
         assert (a.length == 4 + turnsEarningFragments);
         d.staminaConsumedToFace = Integer.parseInt(a[0]);
