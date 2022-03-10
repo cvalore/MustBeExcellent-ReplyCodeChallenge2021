@@ -1,6 +1,7 @@
 package sandbox.rcc_2022;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,6 +81,11 @@ public class Demon {
     }
 
     public int getMaxReward(int turns) {
+
+        if(rewardMap.size() == 0){
+            return 0;
+        }
+
         if (rewardMap.containsKey(turns)) {
             return rewardMap.get(turns);
         } else {

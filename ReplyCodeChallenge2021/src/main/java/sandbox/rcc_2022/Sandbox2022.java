@@ -17,7 +17,7 @@ public class Sandbox2022 implements Sandbox {
 
     private static final String COMMON_INPUT_PATH = "input/2022/";
 
-    private static final String INPUT_FILENAME = "00-example.txt";
+    private static final String INPUT_FILENAME = "02-iot-island-of-terror.txt";
 
 
     //region INPUT FIELDS
@@ -52,7 +52,7 @@ public class Sandbox2022 implements Sandbox {
             LOGGER.error("Exception while reading file: [{}]", e.getErrorCode().code(), e);
         }
 
-        if(!readSuccess) {
+        if (!readSuccess) {
             return;
         }
 
@@ -67,6 +67,10 @@ public class Sandbox2022 implements Sandbox {
         AbstractWriter writer = new Writer2022();
         try {
             writer.initWriter(INPUT_FILENAME);
+            for (Integer i : processor2022.getUsedDemons()) {
+                writer.writeLine(String.valueOf(i));
+                writer.writeLine("\n");
+            }
         } catch (RCCException e) {
             LOGGER.error("Write line throws error: {}", e.getErrorCode().code(), e);
         }

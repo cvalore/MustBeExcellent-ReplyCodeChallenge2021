@@ -78,6 +78,10 @@ public class FileProcessor2022 implements FileProcessorInterface {
             throw new RCCException(ProcessorErrorCode.RUN_WITHOUT_PROCESSING);
         }
 
+        defeatedDemonsPerStamina = new ArrayList<>();
+        defeatedDemonsPerFragments = new ArrayList<>();
+        defeatedDemonsPerTurn = new HashMap();
+
         usedDemons = new ArrayList<>();
 
         inputDemons.sort(Demon::compareByStamina);
@@ -85,14 +89,9 @@ public class FileProcessor2022 implements FileProcessorInterface {
         Collections.reverse(demonsByStamina);
 
 
-        inputDemons.sort((o1, o2) -> o1.compareByFinalReward(o2, turnsAvailable.getValue()));
-        demonsByFinalReward = new ArrayList<>(inputDemons);
-        ;
-        Collections.reverse(demonsByFinalReward);
-
         inputDemons.sort(Demon::compareByFinalStaminaRecoveryRate);
         demonsByStaminaRecoveryRate = new ArrayList<>(inputDemons);
-        ;
+
         Collections.reverse(demonsByStaminaRecoveryRate);
 
         gameLoop();
@@ -101,9 +100,23 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
     private void gameLoop() {
         for (int i = 0; i < this.turnsAvailable.getValue(); i++) {
+
+            LOGGER.info("turn: {}", i);
+            inputDemons.sort((o1, o2) -> o1.compareByFinalReward(o2, turnsAvailable.getValue() - currentTurn));
+            demonsByFinalReward = new ArrayList<>(inputDemons);
+
+            Collections.reverse(demonsByFinalReward);
+
             recoverStamina();
-            chooseDemonToFace();
+            Demon d = chooseDemonToFace();
+
+            if (d != null) {
+                usedDemons.add(d.getId());
+                faceDemon(d);
+            }
             collectFragments();
+
+            currentTurn++;
         }
 
     }
@@ -160,9 +173,11 @@ public class FileProcessor2022 implements FileProcessorInterface {
         List<Map.Entry<Integer, Integer>> demonsByPoints = new ArrayList<>(pointsByDemon.entrySet());
         demonsByPoints.sort(Map.Entry.comparingByValue());
 
-        for (Demon d : inputDemons) {
-            if (d.getId() == demonsByPoints.get(0).getKey()) {
-                return d;
+        for (Map.Entry<Integer, Integer> demoncandidate : demonsByPoints) {
+            Demon candidate = inputDemons.get(demoncandidate.getKey());
+
+            if (canFaceDemon(candidate) && isStaminaEnough(candidate.getStaminaConsumedToFace())) {
+                return candidate;
             }
         }
         return null;
@@ -177,7 +192,7 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
         totalScore = 0;
         defeatedDemonsPerFragments.forEach(d -> {
-            if(d.getRewardMap().get(currentTurn - d.getTurnDefeated()) == null) {
+            if (d.getRewardMap().get(currentTurn - d.getTurnDefeated()) == null) {
                 toBeRemoved.add(d);
             } else {
                 totalScore += d.getRewardMap().get(currentTurn - d.getTurnDefeated());
@@ -219,22 +234,17 @@ public class FileProcessor2022 implements FileProcessorInterface {
     }
 
     private void faceDemon(Demon d) {
-        //TODO other logic if needed..
-        boolean win = false;
 
-        //..
+        //check if correct
+        defeatedDemonsPerTurn.computeIfPresent(currentTurn, (t, list) -> {
+            list.add(d);
+            return list;
+        });
+        defeatedDemonsPerTurn.putIfAbsent(currentTurn, new ArrayList<>(Collections.singleton(d)));
+        d.setTurnDefeated(currentTurn);
+        defeatedDemonsPerStamina.add(d);
+        defeatedDemonsPerFragments.add(d);
 
-        if (win) {
-            //check if correct
-            defeatedDemonsPerTurn.computeIfPresent(currentTurn, (t, list) -> {
-                list.add(d);
-                return list;
-            });
-            defeatedDemonsPerTurn.putIfAbsent(currentTurn, new ArrayList<>(Collections.singleton(d)));
-            d.setTurnDefeated(currentTurn);
-            defeatedDemonsPerStamina.add(d);
-            defeatedDemonsPerFragments.add(d);
-        }
 
         d.setFaced(true);
     }
