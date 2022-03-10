@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import sandbox.CommonUtils;
 import sandbox.FileProcessorInterface;
 import sandbox.exceptions.RCCException;
+import sandbox.exceptions.errors.ProcessorErrorCode;
 
 import javax.validation.constraints.NotNull;
 import java.io.InputStream;
@@ -54,11 +55,15 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
     @Override
     public void run() throws RCCException {
-
+        if (!processed) {
+            LOGGER.error("run invoked on processor without previous processing");
+            throw new RCCException(ProcessorErrorCode.RUN_WITHOUT_PROCESSING);
+        }
+        LOGGER.info("TODO: TO BE IMPLEMENTED - do algorithm implementation here");
     }
 
     @Override
     public void setProcessed() {
-
+        this.processed = true;
     }
 }
