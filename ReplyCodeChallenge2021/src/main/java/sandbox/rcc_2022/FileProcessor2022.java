@@ -13,7 +13,6 @@ import sandbox.exceptions.errors.ProcessorErrorCode;
 import javax.validation.constraints.NotNull;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Builder
@@ -35,7 +34,8 @@ public class FileProcessor2022 implements FileProcessorInterface {
     private boolean processed;
     private int lineRead;
 
-    private List<Demon> defeatedDemons = new ArrayList<>();
+    private List<Demon> defeatedDemonsPerStamina = new ArrayList<>();
+    private List<Demon> defeatedDemonsPerFragments = new ArrayList<>();
     private Map<Integer, List<Demon>> defeatedDemonsPerTurn = new HashMap<>();
     private boolean defeatedDemonThisTurn;
 
@@ -96,11 +96,12 @@ public class FileProcessor2022 implements FileProcessorInterface {
     private void gameLoop() {
         recoverStamina();
         chooseDemonToFace();
+        collectFragments();
     }
 
     private void recoverStamina() {
         List<Demon> toBeRemoved = new ArrayList<>();
-        defeatedDemons.forEach(d -> {
+        defeatedDemonsPerStamina.forEach(d -> {
             int remainingTurns = d.decreaseTurnToRecoverStamina(1);
             if(remainingTurns == 0) {
                 toBeRemoved.add(d);
@@ -108,7 +109,7 @@ public class FileProcessor2022 implements FileProcessorInterface {
             }
         });
 
-        toBeRemoved.forEach(d -> defeatedDemons.remove(d));
+        toBeRemoved.forEach(d -> defeatedDemonsPerStamina.remove(d));
     }
 
     private void chooseDemonToFace() {
@@ -122,7 +123,19 @@ public class FileProcessor2022 implements FileProcessorInterface {
         if(currentTurn > this.turnsAvailable.getValue()) {
             return;
         }
-        //TODO..
+
+        List<Demon> toBeRemoved = new ArrayList<>();
+
+        totalScore = 0;
+        defeatedDemonsPerFragments.forEach(d -> {
+            if(d.getRewardMap().get(currentTurn - d.getTurnDefeated()) == null) {
+                toBeRemoved.add(d);
+            } else {
+                totalScore += d.getRewardMap().get(currentTurn - d.getTurnDefeated());
+            }
+        });
+
+        toBeRemoved.forEach(d -> defeatedDemonsPerFragments.remove(d));
     }
 
     @Override
@@ -169,7 +182,9 @@ public class FileProcessor2022 implements FileProcessorInterface {
                 return list;
             });
             defeatedDemonsPerTurn.putIfAbsent(currentTurn, new ArrayList<>(Collections.singleton(d)));
-            defeatedDemons.add(d);
+            d.setTurnDefeated(currentTurn);
+            defeatedDemonsPerStamina.add(d);
+            defeatedDemonsPerFragments.add(d);
         }
 
         d.setFaced(true);

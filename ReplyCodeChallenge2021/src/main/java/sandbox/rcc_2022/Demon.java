@@ -25,6 +25,7 @@ public class Demon {
     private List<Integer> fragmentsEarnt = new ArrayList<>();
     private Map<Integer, Integer> rewardMap = new HashMap<>();
     private boolean faced;
+    private int turnDefeated;
 
     public static Demon createFromStringArray(String[] a) {
         Demon d = new Demon();
@@ -52,6 +53,7 @@ public class Demon {
         }
 
         d.faced = false;
+        d.turnDefeated = 0;
 
         return d;
     }
