@@ -30,10 +30,6 @@ public class Demon {
 
     public static Demon createFromStringArray(String[] a) {
         Demon d = new Demon();
-
-        d.setId(idGen);
-        idGen++;
-
         assert(a.length >= 4);
         int turnsEarningFragments = Integer.parseInt(a[3]);
         assert (a.length == 4 + turnsEarningFragments);
@@ -99,5 +95,10 @@ public class Demon {
             this.turnsToRecoverStamina = 0;
         }
         return this.turnsToRecoverStamina;
+    }
+
+    public void setId() {
+        this.setId(idGen);
+        idGen++;
     }
 }

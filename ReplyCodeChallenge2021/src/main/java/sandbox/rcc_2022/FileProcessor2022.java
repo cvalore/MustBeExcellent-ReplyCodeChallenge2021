@@ -50,6 +50,7 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
 
     private List<Integer> usedDemons;
+    int notUsedDemons;
 
     @Override
     public void process(InputStream inputStream) {
@@ -67,7 +68,14 @@ public class FileProcessor2022 implements FileProcessorInterface {
             demonsAvailable.setValue(Integer.parseInt(splitted[3]));
         } else {
             Demon demon = Demon.createFromStringArray(splitted);
-            inputDemons.add(demon);
+            if(demon.getRewardMap().size() > 0 && demon.getStaminaConsumedToFace() < maxStamina.getValue() &&
+                demon.getRewardMap().get(demon.getRewardMap().size()) > demon.getRewardMap().size()
+            )  {
+                inputDemons.add(demon);
+                demon.setId();
+            } else {
+                notUsedDemons ++;
+            }
         }
         lineRead++;
     }
@@ -78,6 +86,8 @@ public class FileProcessor2022 implements FileProcessorInterface {
             LOGGER.error("run invoked on processor without previous processing");
             throw new RCCException(ProcessorErrorCode.RUN_WITHOUT_PROCESSING);
         }
+
+        LOGGER.info("Not used demons: [{}] / [{}]", notUsedDemons, demonsAvailable.getValue());
 
         defeatedDemonsPerStamina = new ArrayList<>();
         defeatedDemonsPerFragments = new ArrayList<>();
@@ -152,30 +162,27 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
         for (int i = 0; i < demonsByStamina.size(); i++) {
             Demon d = demonsByStamina.get(i);
-            if (pointsByDemon.containsKey(d.getId())) {
-                pointsByDemon.put(d.getId(), pointsByDemon.get(d.getId()) + i);
+            int id = d.getId();
+            if (pointsByDemon.containsKey(id)) {
+                pointsByDemon.put(id, pointsByDemon.get(id) + i);
             } else {
-                pointsByDemon.put(d.getId(), i);
+                pointsByDemon.put(id, i);
             }
-        }
 
-
-        for (int i = 0; i < demonsByFinalReward.size(); i++) {
-            Demon d = demonsByFinalReward.get(i);
-            if (pointsByDemon.containsKey(d.getId())) {
-                pointsByDemon.put(d.getId(), pointsByDemon.get(d.getId()) + i);
+            Demon d2 = demonsByFinalReward.get(i);
+            int id1 = d2.getId();
+            if (pointsByDemon.containsKey(id1)) {
+                pointsByDemon.put(id1, pointsByDemon.get(id1) + i);
             } else {
-                pointsByDemon.put(d.getId(), i);
+                pointsByDemon.put(id1, i);
             }
-        }
 
-
-        for (int i = 0; i < demonsByStaminaRecoveryRate.size(); i++) {
-            Demon d = demonsByStaminaRecoveryRate.get(i);
-            if (pointsByDemon.containsKey(d.getId())) {
-                pointsByDemon.put(d.getId(), pointsByDemon.get(d.getId()) + i);
+            Demon d3 = demonsByStaminaRecoveryRate.get(i);
+            int id2 = d3.getId();
+            if (pointsByDemon.containsKey(id2)) {
+                pointsByDemon.put(id2, pointsByDemon.get(id2) + i);
             } else {
-                pointsByDemon.put(d.getId(), i);
+                pointsByDemon.put(id2, i);
             }
         }
 
