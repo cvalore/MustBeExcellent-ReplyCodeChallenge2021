@@ -1,5 +1,6 @@
 package sandbox.rcc_2022;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sandbox.AbstractWriter;
@@ -36,9 +37,11 @@ public class Sandbox2022 implements Sandbox {
 
     @Override
     public void run() {
+        CommonUtils.setLoggingLevel(Level.INFO);
+
         boolean readSuccess = true;
 
-        String INPUT_FILENAME = INPUT_FILENAME_6;
+        String INPUT_FILENAME = INPUT_FILENAME_3;
 
         LOGGER.debug("Starting sandbox run");
 
@@ -51,6 +54,8 @@ public class Sandbox2022 implements Sandbox {
                 .build();
         Reader reader = new Reader(processor2022);
         String filename = COMMON_INPUT_PATH + INPUT_FILENAME;
+
+        LOGGER.info("----- Starting with filename: {}", INPUT_FILENAME);
 
         try {
             reader.readFile(filename);
@@ -83,6 +88,8 @@ public class Sandbox2022 implements Sandbox {
         }
 
         writer.closeWriter();
+
+        LOGGER.info("----- Finished with filename: {}", INPUT_FILENAME);
 
         LOGGER.debug("End sandbox");
     }

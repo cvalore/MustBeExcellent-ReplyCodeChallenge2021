@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.extern.java.Log;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.util.StopWatch;
 import sandbox.CommonUtils;
 import sandbox.FileProcessorInterface;
 import sandbox.exceptions.RCCException;
@@ -59,7 +60,7 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
     @Override
     public void process(String line) {
-        LOGGER.info("Read: {}", line);
+        LOGGER.debug("Read: {}", line);
         String[] splitted = line.split(" ");
         if (lineRead == 0) {
             currentStamina.setValue(Integer.parseInt(splitted[0]));
@@ -115,6 +116,9 @@ public class FileProcessor2022 implements FileProcessorInterface {
     }
 
     private void gameLoop() {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
         for (int i = 0; i < this.turnsAvailable.getValue(); i++) {
 
             if(currentStamina.getValue() < 0 || currentStamina.getValue() >= maxStamina.getValue()){
@@ -129,7 +133,7 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
             recoverStamina();
 
-            LOGGER.info("turn: {}, stamina: {}", i, currentStamina);
+            LOGGER.debug("turn: {}, stamina: {}", i, currentStamina);
             Demon d = chooseDemonToFace();
 
             if (d != null) {
@@ -137,25 +141,27 @@ public class FileProcessor2022 implements FileProcessorInterface {
                 faceDemon(d);
             }
 
-            //collectFragments();
+            collectFragments();
 
             currentTurn++;
         }
 
+        stopWatch.stop();
+        LOGGER.info("Processing took: {} seconds", stopWatch.getTotalTimeSeconds());
+        LOGGER.info("totalScore: [{}]", totalScore);
     }
 
     private void recoverStamina() {
-        List<Demon> toBeRemoved = new ArrayList<>();
-        defeatedDemonsPerStamina.forEach(d -> {
+        for(int i = 0; i < defeatedDemonsPerStamina.size(); i++) {
+            Demon d = defeatedDemonsPerStamina.get(i);
             int remainingTurns = d.decreaseTurnToRecoverStamina(1);
             if (remainingTurns == 0) {
-                toBeRemoved.add(d);
+                defeatedDemonsPerStamina.remove(i);
+                i--;
                 increaseStamina(d.getRecoveredStamina());
-                LOGGER.info("Recovered {} stamina form deamon {}", d.getRecoveredStamina(), d.getId());
+                LOGGER.debug("Recovered {} stamina form deamon {}", d.getRecoveredStamina(), d.getId());
             }
-        });
-
-        toBeRemoved.forEach(d -> defeatedDemonsPerStamina.remove(d));
+        }
     }
 
     private Demon chooseDemonToFace() {
@@ -210,15 +216,16 @@ public class FileProcessor2022 implements FileProcessorInterface {
         List<Demon> toBeRemoved = new ArrayList<>();
 
         totalScore = 0;
-        defeatedDemonsPerFragments.forEach(d -> {
-            if (d.getRewardMap().get(currentTurn - d.getTurnDefeated()) == null) {
-                toBeRemoved.add(d);
+        for(int i = 0; i < defeatedDemonsPerFragments.size(); i++) {
+            Demon d = defeatedDemonsPerFragments.get(i);
+            int key = currentTurn - d.getTurnDefeated() + 1;
+            if(d.getRewardMap().get(key) == null) {
+                defeatedDemonsPerFragments.remove(i);
+                i--;
             } else {
-                totalScore += d.getRewardMap().get(currentTurn - d.getTurnDefeated());
+                totalScore += d.getRewardMap().get(key);
             }
-        });
-
-        toBeRemoved.forEach(d -> defeatedDemonsPerFragments.remove(d));
+        }
     }
 
     @Override
@@ -254,9 +261,8 @@ public class FileProcessor2022 implements FileProcessorInterface {
 
     private void faceDemon(Demon d) {
 
-        LOGGER.warn("Fight demon {}, required stamina [{}]",d.getId(), d.getStaminaConsumedToFace());
+        LOGGER.debug("Fight demon {}, required stamina [{}]",d.getId(), d.getStaminaConsumedToFace());
 
-        //check if correct
         defeatedDemonsPerTurn.computeIfPresent(currentTurn, (t, list) -> {
             list.add(d);
             return list;

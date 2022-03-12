@@ -3,6 +3,7 @@ package sandbox;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.util.StopWatch;
 import sandbox.exceptions.RCCException;
 import sandbox.exceptions.errors.ReaderErrorCode;
 import sandbox.exceptions.errors.StringUtilsErrorCode;
@@ -83,6 +84,9 @@ public class Reader {
             //option 1
             //this.processor.process(inputStream);
 
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+
             //option 2
             try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
                 String line;
@@ -95,6 +99,8 @@ public class Reader {
                 throw new RCCException(ReaderErrorCode.ERROR_WHILE_READING);
             }
 
+            stopWatch.stop();
+            LOGGER.info("Read took: {} seconds", stopWatch.getTotalTimeSeconds());
         } catch (FileNotFoundException e) {
             LOGGER.error("File not found", e);
             throw new RCCException(ReaderErrorCode.FILE_NOT_FOUND);

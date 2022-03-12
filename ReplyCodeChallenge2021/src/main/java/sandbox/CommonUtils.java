@@ -4,6 +4,8 @@ package sandbox;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
@@ -19,6 +21,10 @@ public class CommonUtils {
             objects[i++] = elem;
         }
         return objects;
+    }
+
+    public static void setLoggingLevel(Level level) {
+        Configurator.setRootLevel(level);
     }
 
     @Getter
